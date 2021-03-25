@@ -557,6 +557,7 @@ static inline void flb_output_return(int ret, struct flb_coro *co) {
     struct flb_output_coro *out_coro;
     struct flb_output_instance *o_ins;
     struct flb_out_thread_instance *th_ins = NULL;
+    struct mk_event_loop *evt_loop = NULL;
 
     out_coro = (struct flb_output_coro *) co->data;
     o_ins = out_coro->o_ins;
@@ -585,13 +586,15 @@ static inline void flb_output_return(int ret, struct flb_coro *co) {
         /* Retrieve the thread instance and prepare pipe channel */
         th_ins = flb_output_thread_instance_get();
         pipe_fd = th_ins->ch_thread_events[1];
+        evt_loop = th_ins->evl;
     }
     else {
         pipe_fd = out_coro->o_ins->ch_events[1];
+        evt_loop = task->config->evl;
     }
 
     /* Notify the event loop about our return status */
-    n = flb_pipe_w(pipe_fd, (void *) &val, sizeof(val));
+    n = flb_pipe_write_async(evt_loop, pipe_fd, (void *) &val, sizeof(val), co);
     if (n == -1) {
         flb_errno();
     }

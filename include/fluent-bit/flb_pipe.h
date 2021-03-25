@@ -45,4 +45,7 @@ int flb_pipe_set_nonblocking(flb_pipefd_t fd);
 ssize_t flb_pipe_read_all(int fd, void *buf, size_t count);
 ssize_t flb_pipe_write_all(int fd, const void *buf, size_t count);
 
+struct flb_coro;
+ssize_t flb_pipe_write_async(struct mk_event_loop *loop, int fd, const void *buf, size_t count, struct flb_coro *th);
+
 #endif

@@ -92,7 +92,7 @@ static inline int handle_output_event(struct flb_config *config,
      * Notify the parent event loop the return status, just forward the same
      * 64 bits value.
      */
-    ret = write(ch_parent, &val, sizeof(val));
+    ret = flb_pipe_write_all(ch_parent, &val, sizeof(val));
     if (ret == -1) {
         flb_errno();
         return -1;
@@ -233,6 +233,14 @@ static void output_thread(void *data)
         flb_engine_evl_set(NULL);
         return;
     }
+
+    ret = flb_pipe_set_nonblocking(th_ins->ch_thread_events[1]);
+    if (ret == -1) {
+        flb_plg_error(th_ins->ins, "could not switch pipe to non-blocking mode");
+        flb_engine_evl_set(NULL);
+        return;
+    }
+
     event_local.type = FLB_ENGINE_EV_OUTPUT;
 
     flb_plg_info(th_ins->ins, "worker #%i started", thread_id);

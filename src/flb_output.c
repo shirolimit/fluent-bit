@@ -800,6 +800,15 @@ int flb_output_init_all(struct flb_config *config)
                   ins->p->name, flb_output_name(ins),
                   ins->ch_events[0], ins->ch_events[1]);
 
+        /* Set write pipe to non-blocking mode */
+        ret = flb_pipe_set_nonblocking(ins->ch_events[1]);
+        if (ret == -1) {
+            flb_error("could not switch events pipe to non-blocking mode for '%s'",
+                      flb_output_name(ins));
+            flb_errno();
+            flb_output_instance_destroy(ins);
+            return -1;
+        }
         /*
          * Note: mk_event_channel_create() sets a type = MK_EVENT_NOTIFICATION by
          * default, we need to overwrite this value so we can do a clean check
