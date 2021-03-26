@@ -165,6 +165,7 @@ static void upstream_thread_destroy(struct flb_out_thread_instance *th_ins)
 static void output_thread(void *data)
 {
     int n;
+    int i;
     int ret;
     int running = FLB_TRUE;
     int stopping = FLB_FALSE;
@@ -239,6 +240,15 @@ static void output_thread(void *data)
         flb_plg_error(th_ins->ins, "could not switch pipe to non-blocking mode");
         flb_engine_evl_set(NULL);
         return;
+    }
+
+    for (i = 0; i <= 1; i++) {
+        ret = flb_pipe_ensure_size(th_ins->ch_thread_events[i], CUSTOM_PIPE_SIZE);
+        if (ret == -1) {
+            flb_plg_error(th_ins->ins, "could not set pipe size to %d",
+                          CUSTOM_PIPE_SIZE);
+            flb_errno();
+        }
     }
 
     event_local.type = FLB_ENGINE_EV_OUTPUT;
