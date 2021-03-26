@@ -181,8 +181,12 @@ static int get_meta_file_info(struct flb_kube *ctx, const char *namespace,
                             payload_size = ret;
                         }
                     }
+                } else {
+                    flb_plg_warn(ctx->ins, "cannot get the size of meta file %s", uri);
                 }
                 close(fd);
+            } else {
+                flb_plg_warn(ctx->ins, "cannot load k8s meta from file %s", uri);
             }
         }
 
