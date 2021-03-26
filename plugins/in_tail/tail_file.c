@@ -1085,6 +1085,9 @@ int flb_tail_file_is_rotated(struct flb_tail_config *ctx,
     /* Get stats from the file name */
     ret = stat(name, &st);
     if (ret == -1) {
+        flb_plg_error(ctx->ins,
+                      "can't get stats for file %s",
+                      name);
         flb_errno();
         flb_free(name);
         return -1;

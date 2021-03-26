@@ -173,6 +173,7 @@ static int get_meta_file_info(struct flb_kube *ctx, const char *namespace,
                 if (fstat(fd, &sb) == 0) {
                     payload = flb_malloc(sb.st_size);
                     if (!payload) {
+                        flb_plg_warn(ctx->ins, "cannot allocate %lld bytes for file %s", sb.st_size, uri);
                         flb_errno();
                     }
                     else {
@@ -181,8 +182,12 @@ static int get_meta_file_info(struct flb_kube *ctx, const char *namespace,
                             payload_size = ret;
                         }
                     }
+                } else {
+                    flb_plg_warn(ctx->ins, "cannot get the size of meta file %s", uri);
                 }
                 close(fd);
+            } else {
+                flb_plg_warn(ctx->ins, "cannot load k8s meta from file %s", uri);
             }
         }
 
