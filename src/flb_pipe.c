@@ -183,6 +183,17 @@ ssize_t flb_pipe_write_all(int fd, const void *buf, size_t count)
     return total;
 }
 
+int flb_pipe_ensure_size(flb_pipefd_t fd, int size)
+{
+    int current_size = fcntl(fd, F_GETPIPE_SZ);
+    if (current_size < 0)
+        return -1;
+    if (current_size >= size) {
+        return 0;
+    }
+    return fcntl(fd, F_SETPIPE_SZ, size);
+}
+
 static int cb_resume_thread(struct mk_event* event)
 {
     struct flb_coro *co;

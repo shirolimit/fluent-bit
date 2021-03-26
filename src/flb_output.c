@@ -768,6 +768,7 @@ const char *flb_output_get_property(const char *key, struct flb_output_instance 
 int flb_output_init_all(struct flb_config *config)
 {
     int ret;
+    int i;
 #ifdef FLB_HAVE_METRICS
     const char *name;
 #endif
@@ -808,6 +809,15 @@ int flb_output_init_all(struct flb_config *config)
             flb_errno();
             flb_output_instance_destroy(ins);
             return -1;
+        }
+
+        for (i = 0; i <= 1; i++) {
+            ret = flb_pipe_ensure_size(ins->ch_events[i], CUSTOM_PIPE_SIZE);
+            if (ret == -1) {
+                flb_error("could not set pipe size to %d for '%s'",
+                          CUSTOM_PIPE_SIZE, flb_output_name(ins));
+                flb_errno();
+            }
         }
         /*
          * Note: mk_event_channel_create() sets a type = MK_EVENT_NOTIFICATION by

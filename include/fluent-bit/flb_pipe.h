@@ -38,10 +38,13 @@
 #define FLB_PIPE_WOULDBLOCK() (errno == EAGAIN || errno == EWOULDBLOCK)
 #endif
 
+#define CUSTOM_PIPE_SIZE 1000*1000*32
+
 int flb_pipe_create(flb_pipefd_t pipefd[2]);
 void flb_pipe_destroy(flb_pipefd_t pipefd[2]);
 int flb_pipe_close(flb_pipefd_t fd);
 int flb_pipe_set_nonblocking(flb_pipefd_t fd);
+int flb_pipe_ensure_size(flb_pipefd_t fd, int size);
 ssize_t flb_pipe_read_all(int fd, void *buf, size_t count);
 ssize_t flb_pipe_write_all(int fd, const void *buf, size_t count);
 
